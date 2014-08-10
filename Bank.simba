@@ -20,11 +20,11 @@ Function GL_InvBounds: TBox; Forward;
 
   Developer Info:
     848640 = Pin Button TextureID.
-    1186662 = Pin Texture ColourID.
+    6297616 = Pin Texture ColourID.
 *}
 Function GL_PinScreen: Boolean;
 Begin
-  Result := Length(glGetTextures(848640, 1186662, 5)) > 0;
+  Result := Length(glGetTextures(848640, 6297616, 5)) > 0;
 End;
 
 {*
@@ -66,7 +66,7 @@ var
 Begin
   Result := True;
   T := glGetTextures(714000);
-  C := glGetTextures([16320, 16320], [2171469, 2898308], [4, 4]);
+  C := glGetTextures([16320, 16320]);//, [2171469, 2898308], [4, 4]);
   If (Length(T) < 1) or (Length(C) < 1) Then Exit;
 
   For I := 0 To High(T) Do
@@ -137,8 +137,8 @@ End;
 
   Developer Info:
     714000  = TextureID containing the 'Bank of Runescape' Text.
-    88773   = TextureID of the lower right of the BankScreen.
-    3786240 = TextureID of the Background of the Bank. Same ID as that of the Inv, Chat, MM.
+    13293   = TextureID of the lower right of the BankScreen.
+    3084480 = TextureID of the Background of the Bank. Same ID as that of the Inv, Chat, MM.
 *}
 Function GL_BankBounds: TBox;
 var
@@ -156,15 +156,15 @@ Begin
     End;
   End;
 
-  T := glGetTextures([714000, 88773]);
+  T := glGetTextures([714000, 13293]);
   SetLength(BA, Length(T));
   For I := 0 To High(T) Do
     BA[I] := T[I].Bounds;
 
   Result := BA.Bounds;
-  T := glGetTextures(3786240, Result);
+  {T := glGetTextures(3084480, Result);
   If (Length(T) > 0) Then
-    Result := T[0].Bounds;
+    Result := T[0].Bounds;}
 
   If (UseSysCache) Then
     SysCache.CacheBank(Result);
@@ -174,14 +174,16 @@ End;
   Returns a Bounding-Box around the area of the bank's inventory where items are.
 
   Developer Info:
-    3786240 = TextureID of the Background of the Bank. Same ID as that of the Inv, Chat, MM.
+    3084480 = TextureID of the Background of the Bank. Same ID as that of the Inv, Chat, MM.
+    545325  = TextureID of the lock in the inventory when the bank is open.
+    1712936 = ColourID of the lock in the inventory when the bank is open.
 *}
 Function GL_BankInvBounds: TBox;
-Label Skip;
 var
   I, J: Integer;
-  BA: TBoxArray;
-  Background: glTextureArray;
+  BBounds: TBox;
+  Areas: TBoxArray;
+  Background, Lock, Slots: glTextureArray;
 Begin
   If (UseSysCache) Then
   Begin
@@ -195,40 +197,42 @@ Begin
 
   Result := IntToBox(-1, -1, -1, -1);
   If (Not GL_BankScreen) Then Exit;
-  SetLength(BA, 4);
-  BA[0] := GL_MMBounds;
-  BA[1] := GL_InvBounds;
-  BA[2] := GL_ChatBounds;
-  BA[3] := GL_BankBounds;
 
-  Background := glGetTextures(3786240);
 
-  For I := 0 To High(Background) Do
-  Begin
-    For J := 0 To High(BA) Do
-    Begin
-      If (PointInBox(MiddleBox(BA[J]), Background[I].Bounds)) Then
-        Goto Skip;
-    End;
+  BBounds := GL_BankBounds;
+  Background := glGetTextures(3084480);
+  Slots := glGetTextures(88625, 1782589, 20);
+  Lock := glGetTextures(545325, 1712936, 20);
 
-    Result := Background[I].Bounds;
-    If (UseSysCache) Then
-        SysCache.CacheBankInv(Result);
-    Exit;
-    Skip:
-  End;
+  For I := 0 To High(Slots) Do
+    For J := 0 To High(Background) Do
+      If (Background[J].Bounds.Contains(Slots[I].Bounds.MidPoint)) Then
+      Begin
+        SetLength(Areas, Length(Areas) + 1);
+        Areas[High(Areas)] := Background[J].Bounds;
+        continue;
+      End;
+
+  For I := 0 To High(Areas) Do
+    If (Not Areas[I].Contains(Lock[0].Bounds.MidPoint)) Then
+      If (Not Areas[I].Contains(GL_BankBounds.MidPoint)) Then
+      Begin
+        Result := Areas[I];
+        If (UseSysCache) Then
+          SysCache.CacheBankInv(Result);
+      End;
 End;
 
 {*
   Returns a count of all items in the inventory when the bank is open.
 
   Developer Info:
-    57120 = TextureID of the top of the BankInventory.
-    20400 = TextureID of the top-right corner of the BankInventory. Same ID as the right side of the BankInventory.
-    46967 = TextureID of the bottom-right corner of the BankInventory.
-    3786240 = TextureID of the Background of the Bank. Same ID as that of the Inv, Chat, MM.
+    //57120 = TextureID of the top of the BankInventory.
+    4080 = TextureID of the top-right corner of the BankInventory. Same ID as the right side of the BankInventory.
+    16320 = TextureID of the bottom-right corner of the BankInventory.
+    33084480 = TextureID of the Background of the Bank. Same ID as that of the Inv, Chat, MM.
 *}
-Function GL_CountBankInv(G: TGraphics): Integer;
+Function GL_CountBankInv: Integer;
   Function glGetTexturesEx(Area: TBox; IDs: TIntegerArray): glTextureArray;
   var
     Ptr: Pointer;
@@ -259,15 +263,15 @@ var
   Found: Boolean;
   T: glTextureArray;
 Begin
-  T := glGetTexturesEx(GL_BankInvBounds, [57120, 20400, 46967]);
+  T := glGetTexturesEx(GL_BankInvBounds, [4080, 16320]);
   For I := 0 To High(T) Do
   Begin
-    If (T[I].ID = 3786240) Then
+    If (T[I].ID = 3084480) Then
       Found := True;
 
     If (Found) Then
     Begin
-      Result := High(T) - I;
+      Result := High(T) - 28;
       Exit;
     End;
   End;

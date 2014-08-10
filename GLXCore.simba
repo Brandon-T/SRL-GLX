@@ -64,6 +64,17 @@ type
   glTextureArray = array of glTexture;
 
 
+Function glTexture.StableBounds: TBox;
+Begin
+  if ((Self.Bounds.X2 < Self.Bounds.X1) or (Self.Bounds.Y2 < Self.Bounds.Y1)) then
+  begin
+    swap(Self.Bounds.X1, Self.Bounds.X2);
+    swap(Self.Bounds.Y1, Self.Bounds.Y2);
+  end;
+
+  result := Self.Bounds;
+End;
+
 {*
   Returns the width of a specified texture.
 

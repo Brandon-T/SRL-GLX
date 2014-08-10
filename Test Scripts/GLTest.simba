@@ -1,0 +1,43 @@
+{$DEFINE SMART}
+{$I GLX/Setup.Simba}
+
+Procedure Debug(var Smart: TSmart);
+Begin
+  glDebug(GL_DEBUG_MODE.GL_MODE_TEXTURES, 0, 0, 0, 10, 0, 0, Smart.Width, Smart.Height);
+End;
+
+Procedure Debug(var Smart: TSMART; ID: Integer; SleepTime: Integer = 0); overload;
+var
+  I: Integer;
+  textures: glTextureArray;
+begin
+  Textures := glGetTextures(ID);
+  glDebug(GL_DEBUG_MODE.GL_MODE_DISPLAY, ID, 0, 0, 10, 0, 0, Smart.Width, Smart.Height);
+
+  For I := 0 To High(Textures) Do
+  Begin
+    Smart.Graphics().DrawBox(textures[I].Bounds);
+    Sleep(SleepTime);
+  End;
+End;
+
+Procedure Debug(var Smart: TSMART; Area: TBox; SleepTime: Integer); overload;
+var
+  I: Integer;
+  textures: glTextureArray;
+begin
+  Textures := glGetTextures(Area);
+
+  For I := 0 To High(Textures) Do
+  Begin
+    glDebug(GL_DEBUG_MODE.GL_MODE_DISPLAY, Textures[I].ID, 0, 0, 0, 0, 0, Smart.Width, Smart.Height);
+    Sleep(SleepTime);
+  End;
+end;
+
+var
+  Smart: TSmart;
+begin
+  UseSysCache := True;
+  SetupGLX(Smart, 1230, 650);
+end.

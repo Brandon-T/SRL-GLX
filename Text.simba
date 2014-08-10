@@ -115,12 +115,14 @@ End;
 
   Developer Info:
     3786240 -   TextureID of the chatbox background (found in the middle of the chatbox).
-    24990   -   TextureID of the chat bubble found (next to the player's name in the chatbox).
+    2040    -   TextureID of the report issue button (at the top right of the chat box).
+    9122    -   TextureID of the game-messages button (at the top left of the char box).
 *}
 Function GL_ChatBounds: TBox;
 var
   I, J: Integer;
-  S, T: glTextureArray;
+  Areas: TBoxArray;
+  Messages, Background, Report: glTextureArray;
 Begin
   If (Not GL_LoggedIn) Then Exit;
   If (UseSysCache) Then
@@ -133,18 +135,33 @@ Begin
     End;
   End;
 
-  T := glGetTextures(3786240);
-  S := glGetTextures(24990);
-  If (Length(T) > 0 and Length(S) > 0) then
-    For I := 0 To High(T) Do
-      For J := 0 To High(S) Do
-        If (PointInBox(Point(S[J].X, S[J].Y), T[I].Bounds)) then
-        begin
-          Result := T[I].Bounds;
-          If (UseSysCache) Then
-            SysCache.CacheChat(Result);
-          Exit;
-        end;
+  Background := glGetTextures(3786240);
+  Messages := glGetTextures(9122, 7491604, 10);
+  Report := glGetTextures(2040, 1642756, 10);
+
+  For I := 0 To High(Background) Do
+    If (Background[I].Bounds.Contains(Messages[0].Bounds.MidPoint)) then
+    begin
+      SetLength(Areas, Length(Areas) + 1);
+      Areas[High(Areas)] := Background[I].Bounds;
+    end;
+
+  For I := 0 To High(Background) Do
+    If (Background[I].Bounds.Contains(Report[0].Bounds.MidPoint)) then
+    begin
+      SetLength(Areas, Length(Areas) + 1);
+      Areas[High(Areas)] := Background[I].Bounds;
+    end;
+
+  If (Length(Areas) > 1) Then
+  Begin
+    Result := Areas.Bounds;
+    If (UseSysCache) Then
+      SysCache.CacheChat(Result);
+    Exit;
+  End;
+
+  Result := IntToBox(-1, -1, -1, -1);
 End;
 
 {*
@@ -174,7 +191,7 @@ Begin
   Options := glGetTextures(52107, B);
   Insert(glGetTextures(52825, B), Options);
   If (Length(Options) < 2) Then Exit;
-  Text := glCharsToTexts(glGetChars(B), 4, 5);
+  Text := glCharsToTexts(glGetChars(B), 2, 5);
 
   TP := Point(-1, -1);
   For I := 0 To High(Text) Do

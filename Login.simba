@@ -48,11 +48,11 @@ End;
   Returns whether or not the current player is in the lobby.
 
   Developer Info:
-    564570    - TextureID of the lobby tab icons.
+    141308    - TextureID of the "Play Now Button Text".
 *}
 Function GL_LobbyScreen: Boolean;
 Begin
-  Result := (Length(glGetTextures(564570)) = 6);
+  Result := (Length(glGetTextures(141308)) = 1);
 End;
 
 {*
@@ -60,14 +60,14 @@ End;
   Returns false otherwise.
 
   Developer Info:
-    2021324   - TextureID of the RS Logo on the login screen.
+    6887954   - TextureID of the RS Logo on the login screen.
 *}
 Function GL_RSReady: Boolean;
 Begin
   Result := (GL_LoggedIn) Or (GL_LobbyScreen);
 
   If (Not Result) Then
-    Result := (Length(glGetTextures(2021324)) > 0);
+    Result := (Length(glGetTextures(6887954)) > 0);
 End;
 
 {*

@@ -38,47 +38,62 @@ type GL_SKILL_LEVEL = (SKILL_ATTACK, SKILL_CONSTITUTION, SKILL_MINING, SKILL_STR
   Returns a bounding-box around the action bar.
 
   Developer Info:
-    12109440 = TextureID of the Action Bar's background.
-    3825     = Minimize button on the action bar.
+    3084480 = TextureID of the Action Bar's background.
+    27185   =  TextureID of the Heart icon on the Action Bar.
+    11475   = Minimize button on the action bar.
 *}
 Function TActionBar.GetBounds: TBox;
 var
   T: glTextureArray;
+  Heart, Minimise: glTextureArray;
+  Areas: TBoxArray;
   I: Integer;
-  B: TBox;
 Begin
-  T := glGetTextures(12109440, 1580578, 10);
+  T := glGetTextures(3084480);
+  Heart := glGetTextures(27185);
+  Minimise := glGetTextures(11475);
+  Result := IntToBox(-1, -1, -1, -1);
+
   For I := 0 To High(T) Do
   Begin
-    Result := IntToBox(T[I].Bounds.X1, T[I].Bounds.Y1, T[I + 1].Bounds.X2, T[I + 1].Bounds.Y2);
-    If (Length(glGetTextures(3825, 3491150, 10, Result)) > 0) Then //Minimize Button.
-      Exit;
+    If (T[I].StableBounds().Contains(Heart[0].StableBounds().MidPoint())) Then
+    begin
+      SetLength(Areas, length(Areas) + 1);
+      Areas[0] := T[I].Bounds;
+    end else
+      If (T[I].StableBounds().Contains(Minimise[0].StableBounds().MidPoint())) Then
+      begin
+        SetLength(Areas, length(Areas) + 1);
+        Areas[1] := T[I].Bounds;
+      end;
   End;
-  Result := IntToBox(-1, -1, -1, -1);
+
+  If (Areas[0].X1 > 0) Then
+    Result := Areas.Bounds;
 End;
 
 {*
   Returns whether or not the action bar is minimised.
 
   Developer Info:
-    6742 - TextureID of the garbage can icon on the action bar when not minimised.
+    28793 - TextureID of the switch-arrow-number icon on the action bar when not minimised.
 *}
 Function TActionBar.IsMinimised: Boolean;
 Begin
-  Result := Length(glGetTextures(6742, 4402694, 10, Self.GetBounds)) > 0;
+  Result := Length(glGetTextures(28793, 2826252, 10, Self.GetBounds)) < 1;
 End;
 
 {*
   Minimises/Hides the action bar if it is showing fully.
 
   Developer Info:
-    3825 - TextureID of the minimise icon on the action bar.
+    11475 - TextureID of the minimise icon on the action bar.
 *}
 Procedure TActionBar.Minimise;
 var
   T: glTextureArray;
 Begin
-  T := glGetTextures(3825, 3491150, 10);
+  T := glGetTextures(11475);
   If ((Length(T) > 0) And (Not Self.IsMinimised)) Then
     MouseBox(T[0].Bounds, MOUSE_LEFT);
 End;
@@ -87,13 +102,13 @@ End;
   Maximises/Shows the action bar if it is not showing fully.
 
   Developer Info:
-    3825 - TextureID of the minimise icon on the action bar.
+    11475 - TextureID of the minimise icon on the action bar.
 *}
 Procedure TActionBar.Maximise;
 var
   T: glTextureArray;
 Begin
-  T := glGetTextures(3825, 3491150, 10);
+  T := glGetTextures(11475);
   If ((Length(T) > 0) And (Self.IsMinimised)) Then
     MouseBox(T[0].Bounds, MOUSE_LEFT);
 End;
@@ -102,26 +117,22 @@ End;
   Returns whether or not the action bar is locked.
 
   Developer Info:
-    8528    - TextureID of the lock icon on the action bar.
-    1749242 - Colour ID of the action bar padlock when locked.
+    7750    - TextureID of the lock icon on the action bar.
+    7623181 - Colour ID of the action bar padlock when locked.
 *}
 Function TActionBar.IsLocked: Boolean;
 Begin
-  Result := Length(glGetTextures(8528, 7688717, 2)) > 0;
+  Result := Length(glGetTextures(7750, 7623181, 2)) > 0;
 End;
 
 {*
   Retrieves the text of the specified texture on the action bar.
-
-  Developer Info:
-    8528    - TextureID of the lock icon on the action bar.
-    1749242 - Colour ID of the action bar padlock when locked.
 *}
 Function TActionBar.TextAt(Texture: glTexture): String;
 var
   TB: TBox;
 Begin
-  If (Not PointInBox(MiddleBox(Texture.Bounds), Self.GetBounds)) Then
+  If (Not Self.GetBounds().Contains(Texture.Bounds.MidPoint())) Then
     Exit;
 
   TB.X1 := Texture.Bounds.X2;
@@ -135,7 +146,7 @@ End;
   Retrurns the current HP level from the action bar.
 
   Developer Info:
-    30894    - TextureID of the HP Icon on the action bar.
+    27185    - TextureID of the HP Icon on the action bar.
 *}
 Function TActionBar.GetHP: Integer;
 var
@@ -143,7 +154,7 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(30894);
+  T := glGetTextures(27185);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
@@ -155,7 +166,7 @@ End;
   Returns the Max HP level from the action bar.
 
   Developer Info:
-    30894    - TextureID of the HP Icon on the action bar.
+    27185    - TextureID of the HP Icon on the action bar.
 *}
 Function TActionBar.GetMaxHP: Integer;
 var
@@ -163,7 +174,7 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(30894);
+  T := glGetTextures(27185);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
@@ -175,19 +186,19 @@ End;
   Returns whether the current player is poisoned or not.
 
   Developer Info:
-    30894    - TextureID of the HP Icon (heart) on the action bar.
-    4591880  - ColourID of the action bar's health icon when not poisoned.
+    27185    - TextureID of the HP Icon (heart) on the action bar.
+    4395016  - ColourID of the action bar's health icon when not poisoned.
 *}
 Function TActionBar.IsPoisoned: Boolean;
 Begin
-  Result := Length(glGetTextures(30894, 4591880, 5)) < 1;
+  Result := Length(glGetTextures(27185, 4395016, 5)) < 1;
 End;
 
 {*
   Returns the Current Adrenaline level from the action bar.
 
   Developer Info:
-    33598    - TextureID of the Adrenaline Icon on the action bar.
+    27966    - TextureID of the Adrenaline Icon on the action bar.
 *}
 Function TActionBar.GetAdrenaline: Integer;
 var
@@ -195,31 +206,11 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(33598);
+  T := glGetTextures(27966);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
-    Result := StrToIntDef(Copy(Text, 0, PosEx('/', Text, 1) - 1), -1);
-  End;
-End;
-
-{*
-  Returns the Max Adrenaline level from the action bar.
-
-  Developer Info:
-    33598    - TextureID of the Adrenaline Icon on the action bar.
-*}
-Function TActionBar.GetMaxAdrenaline: Integer;
-var
-  Text: String;
-  T: glTextureArray;
-Begin
-  Result := -1;
-  T := glGetTextures(33598);
-  If (Length(T) > 0) Then
-  Begin
-    Text := Self.TextAt(T[0]);
-    Result := StrToIntDef(Copy(Text, PosEx('/', Text, 1) + 1, 20), -1);
+    Result := StrToIntDef(Copy(Text, 0, PosEx('%', Text, 1) - 1), -1);
   End;
 End;
 
@@ -227,7 +218,7 @@ End;
   Returns the Current Prayer level from the action bar.
 
   Developer Info:
-    23579    - TextureID of the Prayer Icon on the action bar.
+    21070    - TextureID of the Prayer Icon on the action bar.
 *}
 Function TActionBar.GetPrayer: Integer;
 var
@@ -235,7 +226,7 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(23579);
+  T := glGetTextures(21070);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
@@ -247,7 +238,7 @@ End;
   Returns the Max Prayer level from the action bar.
 
   Developer Info:
-    23579    - TextureID of the Prayer Icon on the action bar.
+    21070    - TextureID of the Prayer Icon on the action bar.
 *}
 Function TActionBar.GetMaxPrayer: Integer;
 var
@@ -255,7 +246,7 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(23579);
+  T := glGetTextures(21070);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
@@ -267,7 +258,7 @@ End;
   Returns the Current Summoning level from the action bar.
 
   Developer Info:
-    23579    - TextureID of the Summoning Icon on the action bar.
+    28704    - TextureID of the Summoning Icon on the action bar.
 *}
 Function TActionBar.GetSummoning: Integer;
 var
@@ -275,7 +266,7 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(31491);
+  T := glGetTextures(28704);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
@@ -287,7 +278,7 @@ End;
   Returns the Max Summoning level from the action bar.
 
   Developer Info:
-    23579    - TextureID of the Summoning Icon on the action bar.
+    28704    - TextureID of the Summoning Icon on the action bar.
 *}
 Function TActionBar.GetMaxSummoning: Integer;
 var
@@ -295,7 +286,7 @@ var
   T: glTextureArray;
 Begin
   Result := -1;
-  T := glGetTextures(31491);
+  T := glGetTextures(28704);
   If (Length(T) > 0) Then
   Begin
     Text := Self.TextAt(T[0]);
@@ -307,11 +298,9 @@ End;
   Returns the Bounding-Box of the Control Panel (Interface containing Hero, Settings, Skills, Equipment).
 
   Developer Info:
-    12109440    - TextureID of the Control Panel's background.
-    163081      - TextureID of the Hero Icon on the Control Panel.
-    4934989     - ColourID of the Hero Icon on the Control Panel.
-    163081      - TextureID of the Settings Button on the Control Panel.
-    6243360     - ColourID of the Settings Button on the Control Panel.
+    3084480    - TextureID of the Control Panel's background.
+    84844      - TextureID of the Hero Icon on the Control Panel.
+    86205      - TextureID of the Settings Button on the Control Panel.
 *}
 Function TControlPanel.GetBounds: TBox;
 var
@@ -320,17 +309,17 @@ var
   B: TBox;
 Begin
   Result := IntToBox(-1, -1, -1, -1);
-  T := glGetTextures(12109440, 1580578, 10);
+  T := glGetTextures(3084480);
   For I := 0 To High(T) Do
   Begin
-    Icons := glGetTextures(163081, 5065803, 5, T[I].Bounds);
+    Icons := glGetTextures(84844, 3815212, 5, T[I].Bounds);
     If (Length(Icons) > 0) Then
     Begin
       Result.X1 := T[I].Bounds.X1;
       Result.Y1 := T[I].Bounds.Y1;
     End;
 
-    Icons := glGetTextures(163081, 6243360, 5, T[I].Bounds);
+    Icons := glGetTextures(86205, 5259553, 5, T[I].Bounds);
     If (Length(Icons) > 0) Then
     Begin
       Result.X2 := T[I].Bounds.X2;
@@ -352,8 +341,8 @@ var
   IDs: TIntegerArray;
   ColourIDs: TIntegerArray;
 Begin
-  IDs := [163081, 163081, 163081, 163082, 163114, 163137, 163200, 163081];
-  ColourIDs := [5065803, 4804684, 6578765, 5395590, 4541232, 6447990, 5987169, 6243360];
+  IDs       := [84844,   88549,   86189,   101389,  131432,  109661,  116281,  86205];
+  ColourIDs := [3815212, 2767934, 5261370, 5984147, 4080169, 4660740, 2438974, 5259553];
   T := glGetTextures(IDs[Ord(CPI)], ColourIDs[Ord(CPI)], 5, Self.GetBounds);
   If (Length(T) > 0) Then
     Result := T[0].Bounds
@@ -380,8 +369,8 @@ var
   IDs: TIntegerArray;
   ColourIDs: TIntegerArray;
 Begin
-  IDs := [29354, 23053, 36941, 21381, 23053, 10821, 35277, 15430, 13142, 30895, 39299, 35316, 33429, 29730, 29105];
-  ColourIDs := [2104351, 922115, 2496271, 1776411, 922115, 2833221, 1449260, 1380875, 3427669, 1446670, 3158550, 3355404, 4142348, 4076577, 3747873];
+  IDs       := [29354,   23053,  36941,   21381,   23053,  10821,    35277,   15430,   13142,   30895,   39299,   35316,   33429,   {21613,}   29730,   29105];    //21613 - twitch streaming
+  ColourIDs := [2170141, 922372, 2561806, 1776153, 922372, 12314109, 1449002, 1446411, 1446926, 4070940, 3158550, 3290125, 4142349, {1671422,} 4076577, 3747617];  //1671422 - twitch streaming
   T := glGetTextures(IDs[Ord(GTI)], ColourIDs[Ord(GTI)], 5);
   If (Length(T) > 0) Then
     Result := T[0].Bounds
@@ -408,8 +397,8 @@ var
   IDs: TIntegerArray;
   ColourIDs: TIntegerArray;
 Begin
-  IDs := [24018, 17353, 23366, 15882, 23053, 9445, 25818, 12900, 11629, 22132, 28175, 22577, 21369, 21623, 21195];
-  ColourIDs := [5000268, 3750201, 4473924, 3815994, 3750201, 3223857, 5131854, 3355443, 3487029, 4737096, 5329233, 4605510, 4473924, 4671303, 4605510];
+  IDs       := [20036,   15729,   22326,   14582,   15729,   7383,    24074,   10528,   8966,    21082,   26815,   21257,   19996,   {-0,} 20284,   19860];          //-0 = twitch place-holder
+  ColourIDs := [3552823, 2105376, 3026479, 2631720, 2105376, 3355443, 3750201, 1907998, 1973791, 3815995, 4144959, 3289650, 3289650, {-0,} 3881788, 3815995];      //-0 = twitch place-holder
   T := glGetTextures(IDs[Ord(GTI)], ColourIDs[Ord(GTI)], 5);
   If (Length(T) > 0) Then
     Result := T[0].Bounds
@@ -437,7 +426,7 @@ End;
                   RANGED, DEFENCE, FRIENDS, FRIENDS_CHAT, CLAN_CHAT, NOTES, MUSIC
 
     155923    - TextureID of the Active Tab Icon.
-    3024408   - ColourID of the Active Tab Icon.
+    1385001   - ColourID of the Active Tab Icon.
 *}
 Function TGameTab.CurrentTab: TGameTabI;
 var
@@ -447,13 +436,14 @@ var
 Begin
   Result := -1;
   B := GL_InvBounds;
-  IDs := [29354, 23053, 36941, 21381, 23053, 10821, 35277, 15430, 13142, 30895, 39299, 35316, 33429, 29730, 29105];
+  IDs := [29354,   23053,  36941,   21381,   23053,  10821,    35277,   15430,   13142,   30895,   39299,   35316,   33429,   {21613,}   29730,   29105];    //21613 - twitch streaming
   Tab := glGetTextures(155923, 1385001, 10, IntToBox(B.X1, B.Y1 - 30, B.X2, B.Y1 - 3));
 
   If (Length(Tab) > 0) Then
   Begin
     Tab := glGetTextures(IDs, Tab[0].Bounds);
-    Result := IDs.IndexOf(Tab[0].ID);
+    if (length(tab) > 0) then
+      Result := IDs.IndexOf(Tab[0].ID);
   End;
 End;
 
@@ -465,8 +455,8 @@ End;
                   SKILLS, ACTIVETASK, BACKPACK, EQUIPMENT, ACTIVE_TASK, PRAYER, MAGIC, MELEE,
                   RANGED, DEFENCE, FRIENDS, FRIENDS_CHAT, CLAN_CHAT, NOTES, MUSIC
 
-    154028    - TextureID of the In-Active Tab Icons.
-    2366996   - ColourID of the In-Active Tab Icons.
+    109148    - TextureID of the In-Active Tab Icons.
+    659217   - ColourID of the In-Active Tab Icons.
     155923    - TextureID of the Active Tab Icon.
     1385001   - ColourID of the Active Tab Icon
 *}
@@ -478,8 +468,8 @@ var
   Tabs: glTextureArray;
 Begin
   B := GL_InvBounds;
-  IDs := [29354, 23053, 36941, 21381, 23053, 10821, 35277, 15430, 13142, 30895, 39299, 35316, 33429, 29730, 29105];
-  Tabs := glGetTextures([154028, 155923], [1186335, 1385001], [10, 10], IntToBox(B.X1, B.Y1 - 30, B.X2, B.Y1 - 3));
+  IDs := [29354,   23053,  36941,   21381,   23053,  10821,    35277,   15430,   13142,   30895,   39299,   35316,   33429,   {21613,}   29730,   29105];    //21613 - twitch streaming
+  Tabs := glGetTextures([109148, 155923], [659217, 1385001], [10, 10], IntToBox(B.X1, B.Y1 - 30, B.X2, B.Y1 - 3));
   If (Length(Tabs) > 0) Then
   Begin
     B := IntToBox(Tabs[0].Bounds.X1, Tabs[0].Bounds.Y1, Tabs[High(Tabs)].Bounds.X2, Tabs[High(Tabs)].Bounds.Y2);
@@ -499,8 +489,8 @@ End;
                   SKILLS, ACTIVETASK, BACKPACK, EQUIPMENT, ACTIVE_TASK, PRAYER, MAGIC, MELEE,
                   RANGED, DEFENCE, FRIENDS, FRIENDS_CHAT, CLAN_CHAT, NOTES, MUSIC
 
-    154028    - TextureID of the In-Active Tab Icons.
-    1186335   - ColourID of the In-Active Tab Icons.
+    109148    - TextureID of the In-Active Tab Icons.
+    659217   - ColourID of the In-Active Tab Icons.
     155923    - TextureID of the Active Tab Icon.
     1385001   - ColourID of the Active Tab Icon
 *}
@@ -513,12 +503,12 @@ var
 Begin
   Result := False;
   B := GL_InvBounds;
-  IDs := [29354, 23053, 36941, 21381, 23053, 10821, 35277, 15430, 13142, 30895, 39299, 35316, 33429, 29730, 29105];
-  Tabs := glGetTextures([154028, 155923], [1186335, 1385001], [10, 10], IntToBox(B.X1, B.Y1 - 30, B.X2, B.Y1 - 3));
+  IDs := [29354,   23053,  36941,   21381,   23053,  10821,    35277,   15430,   13142,   30895,   39299,   35316,   33429,   {21613,}   29730,   29105];    //21613 - twitch streaming
+  Tabs := glGetTextures([109148, 155923], [659217, 1385001], [10, 10], IntToBox(B.X1, B.Y1 - 30, B.X2, B.Y1 - 3));
   If (Length(Tabs) > 0) Then
   Begin
     B := IntToBox(Tabs[0].Bounds.X1, Tabs[0].Bounds.Y1, Tabs[High(Tabs)].Bounds.X2, Tabs[High(Tabs)].Bounds.Y2);
-    Tabs := glGetTextures(IDs, B);
+    Tabs := glGetTextures(IDs[Ord(GTI)], B);
 
     For I := 0 To High(Tabs) Do
       If (IDs.IndexOf(Tabs[I].ID) = GTI) Then
@@ -543,16 +533,8 @@ Begin
   If (Result) Then
     Exit;
 
-  case GTI of
-    TGameTabI.GT_SKILLS, TGameTabI.GT_ACTIVETASK:                                                                     B := CP.GetBounds(TControlPanelI.CP_HERO);
-    TGameTabI.GT_BACKPACK, TGameTabI.GT_EQUIPMENT:                                                                    B := CP.GetBounds(TControlPanelI.CP_GEAR);
-    TGameTabI.GT_ACTIVE_TASK:                                                                                         B := CP.GetBounds(TControlPanelI.CP_ADVENTURES);
-    TGameTabI.GT_PRAYER, TGameTabI.GT_MAGIC, TGameTabI.GT_MELEE, TGameTabI.GT_RANGED, TGameTabI.GT_DEFENCE:           B := CP.GetBounds(TControlPanelI.CP_POWERS);
-    TGameTabI.GT_FRIENDS, TGameTabI.GT_FRIENDS_CHAT, TGameTabI.GT_CLAN_CHAT:                                          B := CP.GetBounds(TControlPanelI.CP_SOCIAL);
-    TGameTabI.GT_NOTES, TGameTabI.GT_MUSIC:                                                                           B := CP.GetBounds(TControlPanelI.CP_OPTIONS);
-  end;
-
   MouseBox(B, MOUSE_MOVE);
+
   T.Start();
   While(T.TimeElapsed < 2500) Do
   Begin

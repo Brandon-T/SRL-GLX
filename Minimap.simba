@@ -306,22 +306,96 @@ Begin
 End;
 
 {*
-  Sets the camera at the highest or lowest angle depending on the argument passed.
-  True for highest, false for lowest.
+  Returns the compass angle in degrees. Angle is found using EulerAngles + Math. VERY ACCURATE!
+  NOTE: This function was previously disabled out. It works now and should be used!
 *}
-Procedure GL_MakeAngleHigh(Highest: Boolean);
+Function GL_CompassDeg: Integer;
+var
+  X, Y, Z: Double;
+begin
+  glEulerAngles(X, Y, Z, GLXMatrices^, True);
+  Result := Round(Degrees(Z));
+end;
+
+{*
+  Returns the compass angle in radians. Angle is found using EulerAngles + Math. VERY ACCURATE!
+  NOTE: This function was previously disabled out. It works now and should be used!
+*}
+Function GL_CompassRad: Integer;
+var
+  X, Y, Z: Double;
+begin
+  glEulerAngles(X, Y, Z, GLXMatrices^, True);
+  Result := Round(Z);
+end;
+
+{*
+  Returns the compass height in degrees. Height is found using EulerAngles + Math. VERY ACCURATE!
+  NOTE: This function was previously disabled out. It works now and should be used!
+*}
+Function GL_CompassHeightDeg: Integer;
+var
+  X, Y, Z: Double;
+begin
+  glEulerAngles(X, Y, Z, GLXMatrices^, True);
+  Result := Round(Degrees(X));
+end;
+
+{*
+  Returns the compass angle in radians. Height is found using EulerAngles + Math. VERY ACCURATE!
+  NOTE: This function was previously disabled out. It works now and should be used!
+*}
+Function GL_CompassHeightRad: Integer;
+var
+  X, Y, Z: Double;
+begin
+  glEulerAngles(X, Y, Z, GLXMatrices^, True);
+  Result := Round(X);
+end;
+
+{*
+  Sets the height of the compass in degrees. Tolerance is the threshold of accuracy.
+  NOTE: This function was previously disabled out. It works now and should be used!
+*}
+Function GL_MakeCompassHeight(Height: Integer; Tolerance: Integer = 8): Boolean;
+var
+  T: Timer;
+  Up: Boolean;
+  CurrentHeight: Integer;
 Begin
-  If (Highest) Then
+  CurrentHeight := GL_CompassHeightDeg;
+  If ((CurrentHeight < 0) or (Not GL_LoggedIn)) Then
+    Exit;
+
+  T.Start();
+  If (Height <= 5) Then Height := RandomRange(5, 7);
+
+  While((abs(CurrentHeight - Height) > Tolerance) and (T.TimeElapsed() < 10000)) do
   Begin
-    KeyDown(VK_UP);
-    Wait(RandomRange(450, 500));
-    KeyUp(VK_UP);
-  End Else
-    Begin
+    Up := Height > CurrentHeight;
+    If (Up) Then
+      KeyDown(VK_UP)
+    Else
       KeyDown(VK_DOWN);
-      Wait(RandomRange(450, 500));
-      KeyUp(VK_DOWN);
+
+    CurrentHeight := GL_CompassHeightDeg;
+    Result := abs(CurrentHeight - Height) <= Tolerance;
+    If (Result) Then
+    Begin
+      If (Up) Then
+        KeyUp(VK_UP)
+      Else
+        KeyUp(VK_DOWN);
+      Break;
     End;
+    Wait(RandomRange(5, 10));
+  End;
+
+  If (Up) Then
+    KeyUp(VK_UP)
+  Else
+    KeyUp(VK_DOWN);
+  Result := Abs(CurrentHeight - Height) <= Tolerance;
 End;
 
 {*
@@ -365,77 +439,4 @@ begin
   Bmp.Create(W, H, UInt32(GLXMap(W, H, X, Y)));
   Result := CreateMirroredBitmapEx(Bmp.GetInternalBitmap().GetIndex, MirrorHeight);
   Bmp.Free();
-end;s
-
-{Function GL_MakeCompassHeight(Height: Integer; Tolerance: Integer = 4): Boolean;
-var
-  T: Timer;
-  Up: Boolean;
-  CurrentHeight: Integer;
-Begin
-  CurrentHeight := GL_CompassHeightDeg;
-  If ((CurrentHeight < 0) or (Not GL_LoggedIn)) Then
-    Exit;
-
-  T.Start();
-  If (Height <= 5) Then Height := RandomRange(5, 7);
-
-  While((abs(CurrentHeight - Height) > Tolerance) and (T.TimeElapsed() < 10000)) do
-  Begin
-    Up := Height > CurrentHeight;
-    If (Up) Then
-      KeyDown(VK_UP)
-    Else
-      KeyDown(VK_DOWN);
-
-    CurrentHeight := GL_CompassHeightDeg;
-    Result := abs(CurrentHeight - Height) <= Tolerance;
-    If (Result) Then
-    Begin
-      If (Up) Then
-        KeyUp(VK_UP)
-      Else
-        KeyUp(VK_DOWN);
-      Break;
-    End;
-    Wait(RandomRange(5, 10));
-  End;
-
-  If (Up) Then
-    KeyUp(VK_UP)
-  Else
-    KeyUp(VK_DOWN);
-  Result := Abs(CurrentHeight - Height) <= Tolerance;
-End;}
-
-{Function GL_CompassDeg: Integer;
-var
-  X, Y, Z: Double;
-begin
-  glEulerAngles(X, Y, Z, GLXMatrices^, True);
-  Result := Round(Degrees(Z));
 end;
-
-Function GL_CompassRad: Integer;
-var
-  X, Y, Z: Double;
-begin
-  glEulerAngles(X, Y, Z, GLXMatrices^, True);
-  Result := Round(Z);
-end;}
-
-{Function GL_CompassHeightDeg: Integer;
-var
-  X, Y, Z: Double;
-begin
-  glEulerAngles(X, Y, Z, GLXMatrices^, True);
-  Result := Round(Degrees(X));
-end;
-
-Function GL_CompassHeightRad: Integer;
-var
-  X, Y, Z: Double;
-begin
-  glEulerAngles(X, Y, Z, GLXMatrices^, True);
-  Result := Round(X);
-end;}

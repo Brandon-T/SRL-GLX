@@ -15,13 +15,13 @@
 
   Developer Info:
     3786240  - TextureID of the inventory background (found in the middle of the inventory).
-    24990    - TextureID of the chat bubble next to the current player's name.
     386611   - TextureID of the corners of the minimap.
 *}
 Function GL_InvBounds: TBox;
 Label Skip;
 var
   I, J: Integer;
+  ChatBox: TBox;
   Background, Others: glTextureArray;
 Begin
   If (UseSysCache) Then
@@ -36,7 +36,9 @@ Begin
 
   Result := IntToBox(-1, -1, -1, -1);
   Background := glGetTextures(3786240);
-  Others := glGetTextures([24990, 386611]);
+  Others := glGetTextures(386611);
+  ChatBox := gl_ChatBounds;
+
   if (Length(Background) < 1) or (Length(Others) < 1) Then
     Exit;
 
@@ -44,7 +46,7 @@ Begin
   Begin
     For J := 0 To High(Others) Do
     Begin
-      If (PointInBox(Point(Others[J].X, Others[J].Y), Background[I].Bounds)) Then
+      If (PointInBox(Point(Others[J].X, Others[J].Y), Background[I].Bounds)) or (PointInBox(Background[I].Bounds.MidPoint, ChatBox)) Then
         Goto Skip;
     End;
 
@@ -155,22 +157,9 @@ Begin
   Begin
     BA := GL_InvSlots;
     If (Length(BA) > 0) Then
-      Result := (Length(glGetTexturesEx(BA.Bounds, [3786240, 88625, 73440, 58472, 65081, 28550, 24480])) - 2);
+      Result := (Length(glGetTexturesEx(BA.Bounds, [3786240, 88625, {73440,} 58472, 65081, 28550, 24480])));
   End Else
-    Begin
-      T := glGetTexturesEx(GL_BankInvBounds, [57120, 20400, 46967]);
-      For I := 0 To High(T) Do
-      Begin
-        If (T[I].ID = 3786240) Then
-          Found := True;
-
-        If (Found) Then
-        Begin
-          Result := High(T) - I;
-          Break;
-        End;
-      End;
-    End;
+    Result := GL_CountBankInv;
 End;
 
 {*

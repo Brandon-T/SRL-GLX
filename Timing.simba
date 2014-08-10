@@ -54,6 +54,28 @@ Begin
   Result := GL_WaitMouseUptext([Option], Time);
 End;
 
+Function GL_WaitFindNPCChatText(Texts: TStringArray; Action: Integer; Time: Integer): Boolean;
+var
+  T: Timer;
+begin
+  T.Start;
+  Result := False;
+  While (T.TimeElapsed < Time) Do
+  Begin
+    If (GL_FindNPCChatText(Texts, Action)) Then
+    Begin
+      Result := True;
+      Exit;
+    End;
+    Wait(20 + Random(10));
+  End;
+End;
+
+Function GL_WaitFindNPCChatText(Text: String; Action: Integer; Time: Integer): Boolean; overload;
+begin
+  Result := GL_WaitFindNPCChatText([Text], Action, Time);
+end;
+
 function GL_WaitFunc(Func: function: boolean; WaitPerLoop, MaxTime: Integer): Boolean;
 var
   T: Integer;
@@ -94,6 +116,38 @@ begin
   while (GetSystemTime < T) do
   begin
     if (Length(glGetTextures(ID)) < 1) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(WaitPerLoop);
+  end;
+end;
+
+function GL_WaitFindTexture(ID: Integer; Colour: Integer; Tolerance: Integer; WaitPerLoop, MaxTime: Integer): Boolean; overload;
+var
+  T: Integer;
+begin
+  T := GetSystemTime + MaxTime;
+  while (GetSystemTime < T) do
+  begin
+    if (Length(glGetTextures(ID, Colour, Tolerance)) < 1) then
+    begin
+      Result := True;
+      Exit;
+    end;
+    Wait(WaitPerLoop);
+  end;
+end;
+
+function GL_WaitFindTexture(ID: Integer; Colour: Integer; Tolerance: Integer; Area: TBox; WaitPerLoop, MaxTime: Integer): Boolean; overload;
+var
+  T: Integer;
+begin
+  T := GetSystemTime + MaxTime;
+  while (GetSystemTime < T) do
+  begin
+    if (Length(glGetTextures(ID, Colour, Tolerance, Area)) < 1) then
     begin
       Result := True;
       Exit;

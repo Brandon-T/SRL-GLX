@@ -101,7 +101,7 @@ Function TSmart.GetPIDs(UnPaired: Boolean): TIntegerArray;
 var
   I, Count: Integer;
 Begin
-  Count := SmartGetClients(UnPaired);
+  Count := SmartClientCount(UnPaired);
   SetLength(Result, Count);
   If (Count > 0) Then
     For I:= 0 to Count - 1 do

@@ -22,6 +22,16 @@ Begin
   Result := GetSystemTime - Time;
 End;
 
+Function Timer.TimeElapsedSeconds: Integer;
+Begin
+  Result := round(self.TimeElapsed / 1000);
+End;
+
+Function Timer.TimeElapsedMinutes: Integer;
+Begin
+  Result := round(self.TimeElapsedSeconds / 60);
+End;
+
 {$IFNDEF SRLCompatibility}
 Procedure TypeByte(B: Byte);
 Begin
@@ -89,6 +99,11 @@ End;
 Function TBox.MidPoint: TPoint;
 Begin
   Result := MiddleBox(Self);
+End;
+
+Function TBox.Contains(Pt: TPoint): Boolean;
+Begin
+  Result := (Pt.X >= Self.X1) and (Pt.X <= Self.X2) and (Pt.Y >= Self.Y1) and (Pt.Y <= Self.Y2);
 End;
 
 Function TIntegerArray.IndexOf(Value: Integer): Integer;
@@ -172,6 +187,12 @@ Begin
     J := J + 4;
   End;
   Result := GetTPABounds(TPA);
+
+  If (Length(Self) = 1) Then
+  Begin
+    Result.X1 := Self[0].X1;
+    Result.Y1 := Self[0].Y1;
+  End;
 End;
 
 Function GetDirectoryName(Directory, Path: String): String;

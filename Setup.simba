@@ -1,4 +1,4 @@
-{$C ON} {$B ON} {$M ON} {$F ON} {$S ON}
+//{$C ON} {$B ON} {$M ON} {$F ON} {$S ON}
 
 {$include_once GLXCore.Simba}
 {$include_once Misc/Graphics.Simba}
