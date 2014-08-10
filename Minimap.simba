@@ -230,8 +230,8 @@ var
 Begin
   If (Not GL_LoggedIn) Then Exit;
 
-  Player.X = 512;
-  Player.Y = 512;
+  Player.X := 512;
+  Player.Y := 512;
   MapPtr := GLXMap(Player.X, Player.Y, X, Y);
   Player := MiddleBox(GL_MMBounds);
 
@@ -321,12 +321,12 @@ end;
   Returns the compass angle in radians. Angle is found using EulerAngles + Math. VERY ACCURATE!
   NOTE: This function was previously disabled out. It works now and should be used!
 *}
-Function GL_CompassRad: Integer;
+Function GL_CompassRad: Single;
 var
   X, Y, Z: Double;
 begin
   glEulerAngles(X, Y, Z, GLXMatrices^, True);
-  Result := Round(Z);
+  Result := Z;
 end;
 
 {*
@@ -345,19 +345,23 @@ end;
   Returns the compass angle in radians. Height is found using EulerAngles + Math. VERY ACCURATE!
   NOTE: This function was previously disabled out. It works now and should be used!
 *}
-Function GL_CompassHeightRad: Integer;
+Function GL_CompassHeightRad: Single;
 var
   X, Y, Z: Double;
 begin
   glEulerAngles(X, Y, Z, GLXMatrices^, True);
-  Result := Round(X);
+  Result := X;
 end;
 
 {*
-  Sets the height of the compass in degrees. Tolerance is the threshold of accuracy.
+  Sets the height of the compass in degrees.
+  Tolerance is the threshold of accuracy. 4 is a nice tolerance.
+  My personal tests show that the lowest angle is: 8 and the highest is 65.
+  The LOWEST possible value you can specify is: 0  - according to my tests at 4 tolerance.
+  The HIGHEST possible value you can specify is: 69 - according to my tests at 4 tolerance.
   NOTE: This function was previously disabled out. It works now and should be used!
 *}
-Function GL_MakeCompassHeight(Height: Integer; Tolerance: Integer = 8): Boolean;
+Function GL_MakeCompassHeight(Height: Integer; Tolerance: Integer = 4): Boolean;
 var
   T: Timer;
   Up: Boolean;
