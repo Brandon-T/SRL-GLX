@@ -115,16 +115,16 @@ End;
 
   Developer Info:
     3786240 -   TextureID of the chatbox background (found in the middle of the chatbox).
-    2040    -   TextureID of the report issue button (at the top right of the chat box).
+    2732    -   TextureID of the info button (at the top right of the chat box).
     9122    -   TextureID of the game-messages button (at the top left of the char box).
+    16262   -   TextureID of the chat-actions button (on the smallest possible chat screen).
 *}
 Function GL_ChatBounds: TBox;
 var
   I, J: Integer;
   Areas: TBoxArray;
-  Messages, Background, Report: glTextureArray;
+  Messages, Background, Info: glTextureArray;
 Begin
-  If (Not GL_LoggedIn) Then Exit;
   If (UseSysCache) Then
   Begin
     I := SysCache.Contains(TCacheType.CACHE_CHAT);
@@ -136,22 +136,24 @@ Begin
   End;
 
   Background := glGetTextures(3786240);
-  Messages := glGetTextures(9122, 7491604, 10);
-  Report := glGetTextures(2040, 1642756, 10);
+  Messages := glGetTextures([9122, 16262], [7491604, 2111553], [10, 10]);
+  Info := glGetTextures([2732, 16262], [2825218, 2111553], [10, 10]);
 
   For I := 0 To High(Background) Do
-    If (Background[I].Bounds.Contains(Messages[0].Bounds.MidPoint)) then
-    begin
-      SetLength(Areas, Length(Areas) + 1);
-      Areas[High(Areas)] := Background[I].Bounds;
-    end;
+    For J := 0 To High(Messages) Do
+      If (Background[I].Bounds.Contains(Messages[J].Bounds.MidPoint)) then
+      begin
+        SetLength(Areas, Length(Areas) + 1);
+        Areas[High(Areas)] := Background[I].Bounds;
+      end;
 
   For I := 0 To High(Background) Do
-    If (Background[I].Bounds.Contains(Report[0].Bounds.MidPoint)) then
-    begin
-      SetLength(Areas, Length(Areas) + 1);
-      Areas[High(Areas)] := Background[I].Bounds;
-    end;
+    For J := 0 To High(Info) Do
+      If (Background[I].Bounds.Contains(Info[J].Bounds.MidPoint)) then
+      begin
+        SetLength(Areas, Length(Areas) + 1);
+        Areas[High(Areas)] := Background[I].Bounds;
+      end;
 
   If (Length(Areas) > 1) Then
   Begin

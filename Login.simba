@@ -37,11 +37,11 @@ end;
   Returns whether or not the current player is in game/logged in fully.
 
   Developer Info:
-    24990    - TextureID of the chat-bubble next to the player name in the chat box.
+    147839    - TextureID of the Compass background.
 *}
 Function GL_LoggedIn: Boolean;
 Begin
-  Result := (Length(glGetTextures(24990)) > 0);
+  Result := (Length(glGetTextures(147839)) > 0);
 End;
 
 {*

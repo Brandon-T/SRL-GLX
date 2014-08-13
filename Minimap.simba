@@ -119,7 +119,8 @@ end;
 *}
 Function GL_MMBounds: TBox;
 var
-  I: Integer;
+  I, J: Integer;
+  TBA: TBoxArray;
   Background, Corners: glTextureArray;
 Begin
   If (UseSysCache) Then
@@ -137,13 +138,21 @@ Begin
   If (Length(Background) < 1) or (Length(Corners) < 1) Then Exit;
 
   For I := 0 To High(Background) Do
-    If (PointInBox(Point(Corners[0].X, Corners[0].Y), Background[I].Bounds)) then
-    Begin
-      Result := Background[I].Bounds;
-      If (UseSysCache) Then
-        SysCache.CacheMinimap(Result);
-      Exit;
-    End;
+    For J := 0 To High(Corners) Do
+      If (PointInBox(Point(Corners[J].X, Corners[J].Y), Background[I].Bounds)) then
+      Begin
+        SetLength(TBA, Length(TBA) + 1);
+        TBA[High(TBA)] := Background[I].Bounds;
+      End;
+
+  If (Length(TBA) > 1) then
+  Begin
+    Result := TBA.Bounds;
+    If (UseSysCache) Then
+      SysCache.CacheMinimap(Result);
+    Exit;
+  End;
+  Result := IntToBox(-1, -1, -1, -1);
 End;
 
 {*
