@@ -51,7 +51,7 @@ var
 Begin
   T := glGetTextures(3084480);
   Heart := glGetTextures(27185);
-  Minimise := glGetTextures(11475);
+  Minimise := glGetTextures(11475, 4603438, 10);
   Result := IntToBox(-1, -1, -1, -1);
 
   For I := 0 To High(T) Do
@@ -299,33 +299,34 @@ End;
 
   Developer Info:
     3084480    - TextureID of the Control Panel's background.
-    84844      - TextureID of the Hero Icon on the Control Panel.
-    86205      - TextureID of the Settings Button on the Control Panel.
+    163200     - TextureID of the Background of each button.
 *}
 Function TControlPanel.GetBounds: TBox;
 var
-  T, Icons: glTextureArray;
-  I: Integer;
-  B: TBox;
+  Background, Icons: glTextureArray;
+  TBA: TBoxArray;
+  I, J: Integer;
 Begin
   Result := IntToBox(-1, -1, -1, -1);
-  T := glGetTextures(3084480);
-  For I := 0 To High(T) Do
-  Begin
-    Icons := glGetTextures(84844, 3815212, 5, T[I].Bounds);
-    If (Length(Icons) > 0) Then
+  Background := glGetTextures(3084480);
+  Icons := glGetTextures(163200);
+
+  For I := 0 To High(Background) Do
+    For J := 0 To High(Icons) Do
     Begin
-      Result.X1 := T[I].Bounds.X1;
-      Result.Y1 := T[I].Bounds.Y1;
+      If (PointInBox(Point(Icons[J].X, Icons[J].Y), Background[I].Bounds)) Then
+      Begin
+        SetLength(TBA, Length(TBA) + 1);
+        TBA[High(TBA)] := Background[I].Bounds;
+      End;
     End;
 
-    Icons := glGetTextures(86205, 5259553, 5, T[I].Bounds);
-    If (Length(Icons) > 0) Then
-    Begin
-      Result.X2 := T[I].Bounds.X2;
-      Result.Y2 := T[I].Bounds.Y2;
-    End;
+  If (Length(TBA) > 1) Then
+  Begin
+    Result := TBA.Bounds;
+    Exit;
   End;
+  Result := IntToBox(-1, -1, -1, -1);
 End;
 
 {*
