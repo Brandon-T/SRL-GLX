@@ -43,7 +43,7 @@ Begin
     Exit;
   end;
 
-  Self.__Target := SmartSpawnClient('C:/Program Files (x86)/Java/jre8/bin/java.exe', Replace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], Width, Height, InitSequence, '', '-XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30', Implode(',', Plugins));
+  Self.__Target := SmartSpawnClient(GetJavaPath(False), Replace(PluginPath, '\', '/', [rfReplaceAll]), Params[0], ',' + Params[1], Width, Height, InitSequence, '', '-XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30', Implode(',', Plugins));
   If (Self.__Target <> 0) Then
   begin
     try
