@@ -146,7 +146,7 @@ Begin
       If (Background[I].Bounds.Contains(chatBoxIcons[J].Bounds.MidPoint)) then
       begin
         if (Length(invIcons) > 0) then
-          if (not Background[I].Bounds.Contains(invIcons[0].Bounds.MidPoint)) then
+          if (Background[I].Bounds.Contains(invIcons[0].Bounds.MidPoint)) then
             Continue;
 
         SetLength(Areas, Length(Areas) + 1);
