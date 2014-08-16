@@ -118,6 +118,7 @@ End;
     2732    -   TextureID of the info button (at the top right of the chat box).
     9122    -   TextureID of the game-messages button (at the top left of the char box).
     16262   -   TextureID of the chat-actions button (on the smallest possible chat screen).
+    73440   -   TextureID of the money pouch and buttons beside it (at the bottom of inventory).
 *}
 Function GL_ChatBounds: TBox;
 var
