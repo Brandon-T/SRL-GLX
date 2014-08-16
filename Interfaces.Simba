@@ -39,36 +39,27 @@ type GL_SKILL_LEVEL = (SKILL_ATTACK, SKILL_CONSTITUTION, SKILL_MINING, SKILL_STR
 
   Developer Info:
     3084480 = TextureID of the Action Bar's background.
-    27185   =  TextureID of the Heart icon on the Action Bar.
-    11475   = Minimize button on the action bar.
 *}
 Function TActionBar.GetBounds: TBox;
 var
   T: glTextureArray;
-  Heart, Minimise: glTextureArray;
+  controlPanel: TControlPanel;
   Areas: TBoxArray;
   I: Integer;
 Begin
-  T := glGetTextures(3084480);
-  Heart := glGetTextures(27185);
-  Minimise := glGetTextures(11475, 4603438, 10);
   Result := IntToBox(-1, -1, -1, -1);
 
+  T := glGetTextures(3084480);
   For I := 0 To High(T) Do
   Begin
-    If (T[I].StableBounds().Contains(Heart[0].StableBounds().MidPoint())) Then
-    begin
-      SetLength(Areas, length(Areas) + 1);
-      Areas[0] := T[I].Bounds;
-    end else
-      If (T[I].StableBounds().Contains(Minimise[0].StableBounds().MidPoint())) Then
-      begin
-        SetLength(Areas, length(Areas) + 1);
-        Areas[1] := T[I].Bounds;
-      end;
+    If (controlPanel.GetBounds().Contains(T[I].StableBounds().MidPoint())) Then
+      Continue;
+
+    SetLength(Areas, Length(Areas) + 1);
+    Areas[High(Areas)] := T[I].Bounds;
   End;
 
-  If (Areas[0].X1 > 0) Then
+  If Length(Areas) > 0 Then
     Result := Areas.Bounds;
 End;
 
@@ -300,6 +291,7 @@ End;
   Developer Info:
     3084480    - TextureID of the Control Panel's background.
     163200     - TextureID of the Background of each button.
+    2413       - TextureID of the customisation button.
 *}
 Function TControlPanel.GetBounds: TBox;
 var
@@ -309,7 +301,7 @@ var
 Begin
   Result := IntToBox(-1, -1, -1, -1);
   Background := glGetTextures(3084480);
-  Icons := glGetTextures(163200);
+  Icons := glGetTextures([163200, 2413]);
 
   For I := 0 To High(Background) Do
     For J := 0 To High(Icons) Do
@@ -318,15 +310,12 @@ Begin
       Begin
         SetLength(TBA, Length(TBA) + 1);
         TBA[High(TBA)] := Background[I].Bounds;
+        Break;
       End;
     End;
 
-  If (Length(TBA) > 1) Then
-  Begin
-    Result := TBA.Bounds;
-    Exit;
-  End;
-  Result := IntToBox(-1, -1, -1, -1);
+  If (Length(TBA) > 0) Then
+    Exit(TBA.Bounds);
 End;
 
 {*
