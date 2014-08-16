@@ -140,18 +140,19 @@ Begin
   Background := glGetTextures(3786240);
   chatBoxIcons := glGetTextures([2732, 9122, 16262]);
   invIcons := glGetTextures(73440);
-  if (Length(invIcons) < 1) then
-    Exit();
 
   For I := 0 To High(Background) Do
     For J := 0 To High(chatBoxIcons) Do
       If (Background[I].Bounds.Contains(chatBoxIcons[J].Bounds.MidPoint)) then
-        if (not Background[I].Bounds.Contains(invIcons[0].Bounds.MidPoint)) then
-        begin
-          SetLength(Areas, Length(Areas) + 1);
-          Areas[High(Areas)] := Background[I].Bounds;
-          Break;
-        end;
+      begin
+        if (Length(invIcons) > 0) then
+          if (not Background[I].Bounds.Contains(invIcons[0].Bounds.MidPoint)) then
+            Continue;
+
+        SetLength(Areas, Length(Areas) + 1);
+        Areas[High(Areas)] := Background[I].Bounds;
+        Break;
+      end;
 
   If (Length(Areas) > 0) Then
   Begin
