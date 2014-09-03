@@ -116,8 +116,8 @@ End;
   Developer Info:
     3786240 -   TextureID of the chatbox background (found in the middle of the chatbox).
     2732    -   TextureID of the info button (at the top right of the chat box).
-    9122    -   TextureID of the game-messages button (at the top left of the char box).
-    16262   -   TextureID of the chat-actions button (on the smallest possible chat screen).
+    9176    -   TextureID of the game-messages button (at the top left of the char box).
+    16316   -   TextureID of the chat-actions button (on the smallest possible chat screen).
     73440   -   TextureID of the money pouch and buttons beside it (at the bottom of inventory).
 *}
 Function GL_ChatBounds: TBox;
@@ -139,7 +139,7 @@ Begin
   Result:= IntToBox(-1, -1, -1, -1);
 
   Background := glGetTextures(3786240);
-  chatBoxIcons := glGetTextures([2732, 9122, 16262]);
+  chatBoxIcons := glGetTextures([2732, 9176, 16316]);
   invIcons := glGetTextures(73440);
 
   For I := 0 To High(Background) Do
