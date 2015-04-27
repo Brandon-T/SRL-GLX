@@ -116,14 +116,15 @@ End;
   Developer Info:
     3786240 -   TextureID of the chatbox background (found in the middle of the chatbox).
     2732    -   TextureID of the info button (at the top right of the chat box).
-    9122    -   TextureID of the game-messages button (at the top left of the char box).
-    16262   -   TextureID of the chat-actions button (on the smallest possible chat screen).
+    9176    -   TextureID of the game-messages button (at the top left of the char box).
+    16316   -   TextureID of the chat-actions button (on the smallest possible chat screen).
+    73440   -   TextureID of the money pouch and buttons beside it (at the bottom of inventory).
 *}
 Function GL_ChatBounds: TBox;
 var
   I, J: Integer;
   Areas: TBoxArray;
-  Messages, Background, Info: glTextureArray;
+  Background, chatBoxIcons, invIcons: glTextureArray;
 Begin
   If (UseSysCache) Then
   Begin
@@ -135,35 +136,31 @@ Begin
     End;
   End;
 
+  Result:= IntToBox(-1, -1, -1, -1);
+
   Background := glGetTextures(3786240);
-  Messages := glGetTextures([9122, 16262], [7491604, 2111553], [10, 10]);
-  Info := glGetTextures([2732, 16262], [2825218, 2111553], [10, 10]);
+  chatBoxIcons := glGetTextures([2732, 9176, 16316]);
+  invIcons := glGetTextures(73440);
 
   For I := 0 To High(Background) Do
-    For J := 0 To High(Messages) Do
-      If (Background[I].Bounds.Contains(Messages[J].Bounds.MidPoint)) then
+    For J := 0 To High(chatBoxIcons) Do
+      If (Background[I].Bounds.Contains(chatBoxIcons[J].Bounds.MidPoint)) then
       begin
+        if (Length(invIcons) > 0) then
+          if (Background[I].Bounds.Contains(invIcons[0].Bounds.MidPoint)) then
+            Continue;
+
         SetLength(Areas, Length(Areas) + 1);
         Areas[High(Areas)] := Background[I].Bounds;
+        Break;
       end;
 
-  For I := 0 To High(Background) Do
-    For J := 0 To High(Info) Do
-      If (Background[I].Bounds.Contains(Info[J].Bounds.MidPoint)) then
-      begin
-        SetLength(Areas, Length(Areas) + 1);
-        Areas[High(Areas)] := Background[I].Bounds;
-      end;
-
-  If (Length(Areas) > 1) Then
+  If (Length(Areas) > 0) Then
   Begin
     Result := Areas.Bounds;
     If (UseSysCache) Then
       SysCache.CacheChat(Result);
-    Exit;
   End;
-
-  Result := IntToBox(-1, -1, -1, -1);
 End;
 
 {*

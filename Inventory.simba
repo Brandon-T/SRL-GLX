@@ -18,11 +18,11 @@
     386611   - TextureID of the corners of the minimap.
 *}
 Function GL_InvBounds: TBox;
-Label Skip;
 var
   I, J: Integer;
   ChatBox: TBox;
   Background, Others: glTextureArray;
+  Areas: TBoxArray;
 Begin
   If (UseSysCache) Then
   Begin
@@ -47,15 +47,19 @@ Begin
     For J := 0 To High(Others) Do
     Begin
       If (PointInBox(Point(Others[J].X, Others[J].Y), Background[I].Bounds)) or (PointInBox(Background[I].Bounds.MidPoint, ChatBox)) Then
-        Goto Skip;
+        Continue(2);
     End;
 
-    Result := Background[I].Bounds;
-    If (UseSysCache) Then
-        SysCache.CacheInventory(Result);
-    Exit;
-    Skip:
+    SetLength(Areas, Length(Areas) + 1);
+    Areas[High(Areas)] := Background[I].Bounds;
   End;
+
+  if Length(Areas) = 0 then
+    Exit;
+
+  Result := Areas.Bounds;
+  If (UseSysCache) Then
+      SysCache.CacheInventory(Result);
 End;
 
 {*
