@@ -37,11 +37,11 @@ end;
   Returns whether or not the current player is in game/logged in fully.
 
   Developer Info:
-    147839    - TextureID of the Compass background.
+    147885    - TextureID of the Compass background.
 *}
 Function GL_LoggedIn: Boolean;
 Begin
-  Result := (Length(glGetTextures(147839)) > 0);
+  Result := (Length(glGetTextures(147885)) > 0);
 End;
 
 {*
@@ -250,8 +250,8 @@ End;
   from the lobby screen to In-Game.
 
   Developer Info:
-    91275     - TextureID of the Play Button on the lobby screen.
-    12483092   - ColourID of the Play button on the lobby screen.
+    1331318     - TextureID of the Play Button on the lobby screen.
+    8806430   - ColourID of the Play button on the lobby screen.
 *}
 Function GL_LoginPlayer(Player: TPlayer): Boolean;
 var
@@ -262,7 +262,7 @@ Begin
   If (Not GL_LoggedIn) Then
     If (GL_LoginToLobby(Player)) Then
     Begin
-      PlayButton := glGetTextures(91275, 12483092, 10);
+      PlayButton := glGetTextures(1331318, 8806430, 10);
       L := Length(PlayButton);
       If (L > 0) Then
       Begin
