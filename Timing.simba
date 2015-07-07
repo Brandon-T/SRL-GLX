@@ -155,3 +155,25 @@ begin
     Wait(WaitPerLoop);
   end;
 end;
+
+{$IFNDEF SRLCompatibility}
+Function msToTime(MS: Integer): String; // Simplified
+Var
+  Time: array [0..2] of Integer;
+Begin
+  ConvertTime(MS, Time[0], Time[1], Time[2]);
+  Result := IntToStr(Time[0]) + ' hr ' + IntToStr(Time[1]) + ' min ' + IntToStr(Time[2]) + ' sec ';
+End;
+{$ENDIF}
+
+{*
+  Determines the rate per hour for a given quantity over an entire timespan/runtime.
+  Example:
+    t := GetTimeRunning(); // The time for which the script has been running.
+    x := x + getCurrQuantity(); // Increment total of x while the script has been running.
+    WriteLn(toPerHour(t, x)); // The rate per hour
+*}
+Function toPerHour(const timeFrame, quantity: Integer): Integer;
+Begin
+  Result := Floor( 3600 * ( quantity ) / ( timeFrame / 1000 ) );
+End;
