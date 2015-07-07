@@ -115,7 +115,7 @@ end;
 
   Developer Info:
     3786240   - TextureID of the minimap background (found in the middle of the minimap).
-    386611    - TextureID of the corners of the minimap.
+    386460    - TextureID of the corners of the minimap.
 *}
 Function GL_MMBounds: TBox;
 var
@@ -134,24 +134,18 @@ Begin
   End;
 
   Background := glGetTextures(3786240);
-  Corners := glGetTextures(386611);
+  Corners := glGetTextures(386460);
   If (Length(Background) < 1) or (Length(Corners) < 1) Then Exit;
 
   For I := 0 To High(Background) Do
-    For J := 0 To High(Corners) Do
-      If (PointInBox(Point(Corners[J].X, Corners[J].Y), Background[I].Bounds)) then
-      Begin
-        SetLength(TBA, Length(TBA) + 1);
-        TBA[High(TBA)] := Background[I].Bounds;
-      End;
+    If (PointInBox(Point(Corners[0].X, Corners[0].Y), Background[I].Bounds)) then
+    Begin
+      Result := Background[I].Bounds;
+      If (UseSysCache) Then
+        SysCache.CacheMinimap(Result);
+      Exit;
+    End;
 
-  If (Length(TBA) > 1) then
-  Begin
-    Result := TBA.Bounds;
-    If (UseSysCache) Then
-      SysCache.CacheMinimap(Result);
-    Exit;
-  End;
   Result := IntToBox(-1, -1, -1, -1);
 End;
 
