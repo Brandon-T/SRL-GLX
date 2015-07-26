@@ -116,15 +116,14 @@ End;
   Developer Info:
     3786240 -   TextureID of the chatbox background (found in the middle of the chatbox).
     2732    -   TextureID of the info button (at the top right of the chat box).
-    9176    -   TextureID of the game-messages button (at the top left of the char box).
-    16316   -   TextureID of the chat-actions button (on the smallest possible chat screen).
-    73440   -   TextureID of the money pouch and buttons beside it (at the bottom of inventory).
+    9122    -   TextureID of the game-messages button (at the top left of the char box).
+    16262   -   TextureID of the chat-actions button (on the smallest possible chat screen).
 *}
 Function GL_ChatBounds: TBox;
 var
   I, J: Integer;
   Areas: TBoxArray;
-  Background, chatBoxIcons, invIcons: glTextureArray;
+  Messages, Background, Info: glTextureArray;
 Begin
   If (UseSysCache) Then
   Begin
@@ -136,31 +135,35 @@ Begin
     End;
   End;
 
-  Result:= IntToBox(-1, -1, -1, -1);
-
   Background := glGetTextures(3786240);
-  chatBoxIcons := glGetTextures([2732, 9176, 16316]);
-  invIcons := glGetTextures(73440);
+  Messages := glGetTextures([9122, 16262], [7491604, 2111553], [10, 10]);
+  Info := glGetTextures([2732, 16262], [2825218, 2111553], [10, 10]);
 
   For I := 0 To High(Background) Do
-    For J := 0 To High(chatBoxIcons) Do
-      If (Background[I].Bounds.Contains(chatBoxIcons[J].Bounds.MidPoint)) then
+    For J := 0 To High(Messages) Do
+      If (Background[I].Bounds.Contains(Messages[J].Bounds.MidPoint)) then
       begin
-        if (Length(invIcons) > 0) then
-          if (Background[I].Bounds.Contains(invIcons[0].Bounds.MidPoint)) then
-            Continue;
-
         SetLength(Areas, Length(Areas) + 1);
         Areas[High(Areas)] := Background[I].Bounds;
-        Break;
       end;
 
-  If (Length(Areas) > 0) Then
+  For I := 0 To High(Background) Do
+    For J := 0 To High(Info) Do
+      If (Background[I].Bounds.Contains(Info[J].Bounds.MidPoint)) then
+      begin
+        SetLength(Areas, Length(Areas) + 1);
+        Areas[High(Areas)] := Background[I].Bounds;
+      end;
+
+  If (Length(Areas) > 1) Then
   Begin
     Result := Areas.Bounds;
     If (UseSysCache) Then
       SysCache.CacheChat(Result);
+    Exit;
   End;
+
+  Result := IntToBox(-1, -1, -1, -1);
 End;
 
 {*
@@ -257,15 +260,17 @@ End;
     5921370   - ColourID of the top corners of the right-click interface.
     8925      - TextureID of the bottom corners of the right-click interface.
     4079167  - ColourID of the bottom corners of the right-click interface.
+    Note: 6/24/2015, added more ID's to get.
 *}
 Function GL_GetChooseOptions(var MenuBounds: TBox): glTextArray;
 var
   TL, LR: glTextureArray;
 Begin
-  TL := glGetTextures(6120, 5921370, 5);
-  LR := glGetTextures(8925, 4079167, 5);
+  TL := glGetTextures([6120, 14418], [5921370, 1120799], [5, 5]);
+  LR := glGetTextures([8925, 15878], [4079167, 1647401], [5, 5]);
 
   If ((Length(TL) < 1) Or (Length(LR) < 1)) Then Exit;
+
   MenuBounds := IntToBox(TL[0].Bounds.X1, TL[0].Bounds.Y2, LR[1].Bounds.X2, LR[1].Bounds.Y2);
   Result := glCharsToTexts(glGetChars(MenuBounds), 5, 7);
 End;

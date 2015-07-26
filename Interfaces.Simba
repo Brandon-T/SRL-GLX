@@ -702,3 +702,81 @@ Begin
       Result := StrToIntDef(ExtractFromStr(Info[3], NUMBERS), -1);
   End;
 End;
+
+function GL_GetAllInterfaceBounds(): TBoxArray;
+type
+  TBoundPoint = record
+    ID: Integer;
+    p: TPoint;
+    b: TBox;
+  end;
+  TBoundPointArray = array of TBoundPoint;
+  function GLArrToTBoundsTPAArray(res: glTextureArray): TBoundPointArray;
+  var i: Integer;
+  begin
+    SetLength( Result, Length( res ) );
+    for i := 0 to High( res ) do
+    begin
+      Result[i].ID := res[i].ID;
+      Result[i].p := Point( res[i].X, res[i].Y );
+      Result[i].b := res[i].Bounds;
+    end;
+  end;
+  procedure calibrateTBoundPoint(var p1, p2: Integer; use_X: Boolean);
+  var d, w, h: Integer;
+  begin
+    GetClientDimensions( w, h );
+    if ( use_X ) then d := w else d := h;
+    if ( p1 < 0 ) then p1 := 0;
+    if ( p2 < 0 ) then p2 := 0;
+    if ( p1 >= d ) then p1 := d - 1;
+    if ( p2 >= d ) then p2 := d - 1;
+  end;
+  function isWithinRange(var x1, x2: Integer; const wiggleRoom: Integer; useX: Boolean): Boolean;
+  begin
+    calibrateTBoundPoint( x1, x2, useX );
+    Result := Abs( x2 - x1 ) <= wiggleRoom;
+  end;
+  function getRectangles(res: TBoundPointArray): TBoxArray;
+  var TL, TR, BL, BR: Integer;
+  var b: TBox;
+  begin
+    if ( Length( res ) < 1 ) then
+    begin
+      Result := [];
+      Exit;
+    end;
+    for TL := 0 to High( res ) do
+      for TR := TL + 1 to High( res ) do
+        for BL := TR + 1 to High( res ) do
+          for BR := BL + 1 to High( res ) do
+          begin
+            if ( not ( isWithinRange(res[TL].p.X, res[BL].p.X, 9, True) ) ) then Continue;
+            if ( not ( isWithinRange(res[TR].p.X, res[BR].p.X, 9, True) ) ) then Continue;
+            if ( not ( isWithinRange(res[TL].p.Y, res[TR].p.Y, 9, False) ) ) then Continue;
+            if ( not ( isWithinRange(res[BL].p.Y, res[BR].p.Y, 9, False) ) ) then Continue;
+            SetLength( Result, Length( Result ) + 1 );
+            calibrateTBoundPoint(res[TL].b.X1, res[BR].b.X2, True);
+            calibrateTBoundPoint(res[TL].b.Y1, res[BR].b.Y2, False);
+            b := IntToBox( res[TL].b.X1, res[TL].b.Y1, res[BR].b.X2, res[BR].b.Y2 );
+            // 20400 = texture id that appears on the sides of interfaces
+            if ( Length( glGetTextures( 20400, b ) ) <> 2 ) then
+            begin
+              SetLength( Result, Length( Result ) - 1 );
+              Continue;
+            end;
+            Result[ High( Result ) ] := b;
+          end;
+  end;
+const
+  TopLandR = 3060; // Top Left/Right corner texture IDs
+  BottomLandR = 28550; // Bottom Left/Right corner texture IDs
+var
+  TPA: TBoundPointArray;
+  gArr: glTextureArray;
+begin
+  if ( not ( GL_LoggedIn() ) ) then Exit;
+  gArr := glGetTextures( [ TopLandR, BottomLandR ] );
+  TPA := GLArrToTBoundsTPAArray( gArr );
+  Result := getRectangles( TPA );
+end;
