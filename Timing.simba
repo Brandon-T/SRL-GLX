@@ -166,14 +166,28 @@ Begin
 End;
 {$ENDIF}
 
-{*
-  Determines the rate per hour for a given quantity over an entire timespan/runtime.
+(*
+  Description:
+    Given timeFrame (in Milliseconds) and quantity (eg. an Integer variable),
+      returns the rate per hour.
+
   Example:
-    t := GetTimeRunning(); // The time for which the script has been running.
-    x := x + getCurrQuantity(); // Increment total of x while the script has been running.
-    WriteLn(toPerHour(t, x)); // The rate per hour
-*}
-Function toPerHour(const timeFrame, quantity: Integer): Integer;
+    program foobar;
+    var
+      t: Integer;
+      q: Integer;
+      result: Int64;
+    begin
+      t := GetTimeRunning();
+      q := getQuantity(); // Sudo function to get current "q" int variable
+      result := perHR(t, q);
+      WriteLn(result);
+    end.
+*)
+Function perHR(const timeFrame, quantity: Integer): Int64;
+var
+  c: Currency;
 Begin
-  Result := Floor( 3600 * ( quantity ) / ( timeFrame / 1000 ) );
+  c := 3600000 / Abs(timeFrame);
+  Result := Floor(c * quantity);
 End;

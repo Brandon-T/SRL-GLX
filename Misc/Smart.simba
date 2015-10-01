@@ -102,18 +102,6 @@ Begin
   Delete(Pointer(@Self), __Smart__Pointers);
 End;
 
-(*
-Function TSmart.GetParams: TStringArray;
-var
-  Params: TStringArray;
-  Page: String;
-Begin
-  Page := Between('<iframe id="game" src="', '"', GetPage('http://www.runescape.com/game.ws?j=1'));
-  Params := Explode(',', Page);
-  Result := Params;
-End;
-*)
-
 Function TSmart.GetParams: TStringArray;
 var
   Params: TStringArray;

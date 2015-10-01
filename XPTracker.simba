@@ -1,0 +1,192 @@
+{*
+    This file contains all functions relating to the [RS3] XP Tracker.
+*}
+
+// Constants that pertain to the XP Tracker in-game texture Icons.
+// Alphabetical Ordered Icons.
+// May display NONE/1/2/3 at any given time.
+const
+  XP_TRACKER_ICON_ID_AGILITY       = 29580;
+  XP_TRACKER_ICON_ID_ALL_COMBAT    = 31110;
+  XP_TRACKER_ICON_ID_ATTACK        = 16918;
+  XP_TRACKER_ICON_ID_CONSTITUTION  = 38262;
+  XP_TRACKER_ICON_ID_CRAFTING      = 33559;
+  XP_TRACKER_ICON_ID_CONSTRUCTION  = 54189;
+  XP_TRACKER_ICON_ID_COOKING       = 47376;
+  XP_TRACKER_ICON_ID_DUNGEONEERING = 58390;
+  XP_TRACKER_ICON_ID_DIVINATION    = 22933;
+  XP_TRACKER_ICON_ID_DEFENCE       = 41952;
+  XP_TRACKER_ICON_ID_EVERY_SKILL   = 48705;
+  XP_TRACKER_ICON_ID_FARMING       = 34536;
+  XP_TRACKER_ICON_ID_FLETCHING     = 19315;
+  XP_TRACKER_ICON_ID_FIREMAKING    = 46008;
+  XP_TRACKER_ICON_ID_FISHING       = 54626;
+  XP_TRACKER_ICON_ID_HERBLORE      = 54427;
+  XP_TRACKER_ICON_ID_HUNTER        = 30306;
+  XP_TRACKER_ICON_ID_MAGIC         = 51211;
+  XP_TRACKER_ICON_ID_MINING        = 16653;
+  XP_TRACKER_ICON_ID_PRAYER        = 23912;
+  XP_TRACKER_ICON_ID_RANGED        = 20999;
+  XP_TRACKER_ICON_ID_RUNECRAFTING  = 33877;
+  XP_TRACKER_ICON_ID_SLAYER        = 54733;
+  XP_TRACKER_ICON_ID_SMITHING      = 31773;
+  XP_TRACKER_ICON_ID_STRENGTH      = 39319;
+  XP_TRACKER_ICON_ID_SUMMONING     = 37582;
+  XP_TRACKER_ICON_ID_THIEVING      = 25506;
+  XP_TRACKER_ICON_ID_WOODCUTTING   = 44243;
+
+  XP_TRACKER_ICON_COL_ID_AGILITY       = 3220239; // full = 3351567
+  XP_TRACKER_ICON_COL_ID_ALL_COMBAT    = 4534812; // full = 5326908
+  XP_TRACKER_ICON_COL_ID_ATTACK        = 1644048; // full = 1644307
+  XP_TRACKER_ICON_COL_ID_CONSTITUTION  = 5247763; // full = 6629929
+  XP_TRACKER_ICON_COL_ID_CRAFTING      = 2696483; // full = 2696223
+  XP_TRACKER_ICON_COL_ID_CONSTRUCTION  = 5916465; // full = 4404776
+  XP_TRACKER_ICON_COL_ID_COOKING       = 2958623; // full = 4205346
+  XP_TRACKER_ICON_COL_ID_DUNGEONEERING = 5455656; // full = 5586218
+  XP_TRACKER_ICON_COL_ID_DIVINATION    = 2633540; // full = 2369598
+  XP_TRACKER_ICON_COL_ID_DEFENCE       = 3552563; // full = 4407871
+  XP_TRACKER_ICON_COL_ID_EVERY_SKILL   = 4736586; // full =
+  XP_TRACKER_ICON_COL_ID_FARMING       = 3158322; // full = 2631977
+  XP_TRACKER_ICON_COL_ID_FLETCHING     = 1642768; // full = 1380626
+  XP_TRACKER_ICON_COL_ID_FIREMAKING    = 5256739; // full = 4466200
+  XP_TRACKER_ICON_COL_ID_FISHING       = 3555911; // full = 2173230
+  XP_TRACKER_ICON_COL_ID_HERBLORE      = 3099168; // full = 2373657
+  XP_TRACKER_ICON_COL_ID_HUNTER        = 1839885; // full = 1708557
+  XP_TRACKER_ICON_COL_ID_MAGIC         = 2040371; // full = 1382953
+  XP_TRACKER_ICON_COL_ID_MINING        = 1248522; // full = 1972760
+  XP_TRACKER_ICON_COL_ID_PRAYER        = 2436403; // full = 2239024
+  XP_TRACKER_ICON_COL_ID_RANGED        = 1183499; // full = 1249292
+  XP_TRACKER_ICON_COL_ID_RUNECRAFTING  = 4272937; // full = 4338730
+  XP_TRACKER_ICON_COL_ID_SLAYER        = 5261117; // full = 4209203
+  XP_TRACKER_ICON_COL_ID_SMITHING      = 2170654; // full = 2368033
+  XP_TRACKER_ICON_COL_ID_STRENGTH      = 4533282; // full = 4796453
+  XP_TRACKER_ICON_COL_ID_SUMMONING     = 3291452; // full = 3817538
+  XP_TRACKER_ICON_COL_ID_THIEVING      = 1381397; // full = 1907740
+  XP_TRACKER_ICON_COL_ID_WOODCUTTING   = 1710094; // full = 1844499
+
+  XP_TRACKER_ICON_IDs := [            XP_TRACKER_ICON_ID_AGILITY,
+    XP_TRACKER_ICON_ID_ALL_COMBAT,    XP_TRACKER_ICON_ID_ATTACK,
+    XP_TRACKER_ICON_ID_CONSTITUTION,  XP_TRACKER_ICON_ID_CRAFTING,
+    XP_TRACKER_ICON_ID_CONSTRUCTION,  XP_TRACKER_ICON_ID_COOKING,
+    XP_TRACKER_ICON_ID_DUNGEONEERING, XP_TRACKER_ICON_ID_DIVINATION,
+    XP_TRACKER_ICON_ID_DEFENCE,       XP_TRACKER_ICON_ID_EVERY_SKILL,
+    XP_TRACKER_ICON_ID_FARMING,       XP_TRACKER_ICON_ID_FLETCHING,
+    XP_TRACKER_ICON_ID_FIREMAKING,    XP_TRACKER_ICON_ID_FISHING,
+    XP_TRACKER_ICON_ID_HERBLORE,      XP_TRACKER_ICON_ID_HUNTER,
+    XP_TRACKER_ICON_ID_MAGIC,         XP_TRACKER_ICON_ID_MINING,
+    XP_TRACKER_ICON_ID_PRAYER,        XP_TRACKER_ICON_ID_RANGED,
+    XP_TRACKER_ICON_ID_RUNECRAFTING,  XP_TRACKER_ICON_ID_SLAYER,
+    XP_TRACKER_ICON_ID_SMITHING,      XP_TRACKER_ICON_ID_STRENGTH,
+    XP_TRACKER_ICON_ID_SUMMONING,     XP_TRACKER_ICON_ID_THIEVING,
+    XP_TRACKER_ICON_ID_WOODCUTTING];
+
+  XP_TRACKER_ICON_COL_IDs := [            XP_TRACKER_ICON_COL_ID_AGILITY,
+    XP_TRACKER_ICON_COL_ID_ALL_COMBAT,    XP_TRACKER_ICON_COL_ID_ATTACK,
+    XP_TRACKER_ICON_COL_ID_CONSTITUTION,  XP_TRACKER_ICON_COL_ID_CRAFTING,
+    XP_TRACKER_ICON_COL_ID_CONSTRUCTION,  XP_TRACKER_ICON_COL_ID_COOKING,
+    XP_TRACKER_ICON_COL_ID_DUNGEONEERING, XP_TRACKER_ICON_COL_ID_DIVINATION,
+    XP_TRACKER_ICON_COL_ID_DEFENCE,       XP_TRACKER_ICON_COL_ID_EVERY_SKILL,
+    XP_TRACKER_ICON_COL_ID_FARMING,       XP_TRACKER_ICON_COL_ID_FLETCHING,
+    XP_TRACKER_ICON_COL_ID_FIREMAKING,    XP_TRACKER_ICON_COL_ID_FISHING,
+    XP_TRACKER_ICON_COL_ID_HERBLORE,      XP_TRACKER_ICON_COL_ID_HUNTER,
+    XP_TRACKER_ICON_COL_ID_MAGIC,         XP_TRACKER_ICON_COL_ID_MINING,
+    XP_TRACKER_ICON_COL_ID_PRAYER,        XP_TRACKER_ICON_COL_ID_RANGED,
+    XP_TRACKER_ICON_COL_ID_RUNECRAFTING,  XP_TRACKER_ICON_COL_ID_SLAYER,
+    XP_TRACKER_ICON_COL_ID_SMITHING,      XP_TRACKER_ICON_COL_ID_STRENGTH,
+    XP_TRACKER_ICON_COL_ID_SUMMONING,     XP_TRACKER_ICON_COL_ID_THIEVING,
+    XP_TRACKER_ICON_COL_ID_WOODCUTTING];
+
+  XP_TRACKER_DEFAULT_TOL = 7;
+
+type
+  TTrackerSkill = (TTS_AGILITY, TTS_ALL_COMBAT, TTS_ATTACK, TTS_CONSTITUTION,
+    TTS_CRAFTING, TTS_CONSTRUCTION, TTS_COOKING, TTS_DUNGEONEERING,
+    TTS_DIVINATION, TTS_DEFENCE, TTS_EVERY_SKILL, TTS_FARMING, TTS_FLETCHING,
+    TTS_FIREMAKING, TTS_FISHING, TTS_HERBLORE, TTS_HUNTER, TTS_MAGIC,
+    TTS_MINING, TTS_PRAYER, TTS_RANGED, TTS_RUNECRAFTING, TTS_SLAYER,
+    TTS_SMITHING, TTS_STRENGTH, TTS_SUMMONING, TTS_THIEVING, TTS_WOODCUTTING);
+
+{*
+  Helper function to strip non-numbers from parsed text.
+  Note: #48 = 0, and #57 = 9
+*}
+function stripNonNum(const s: String): String;
+var
+  c: Char;
+  i: Integer;
+begin
+  for i := 1 to Length(s) do
+  begin
+    c := s[i];
+    if ((c >= #48) and (c <= #57)) then
+      Result := Result + c;
+  end;
+end;
+
+(*
+ * GL_GetXPTracker
+ *
+ * Parameter:
+ *   TTS = The skill of the tracker to find
+ *
+ * Pre-condition:
+ *  - Have the specified TTS (TTrackerSkill) look for a unique XP Icon.
+ *      (Meaning, don't have 2 of the same counters displayed for a XP Icon)
+ *
+ * Description:
+ *  - Attempts to find and grabs the XP from a XP Tracker.
+ *
+ * Notes:
+ *  - May conflict with duplicate textures on screen.
+ *  - Defaults to -1 in case of XP parsing failure(s).
+ *  - Doesn't handle discerning between 2 of the same icons appearing.
+ *  - May need to check for dimensions exceeding the current client dimensions.
+ *
+ * Returns:
+ *  >= 0: Any amount of visible EXP being displayed
+ *    -1: No Tracker Icon's found, or When a counter displays "Lots!", or
+ *        When a Tracker Icon is found somewhere else, (eg. There's a false
+ *          Tracker Icon that appears in the 'Make-progress' interfaces)
+ *)
+function GL_GetXPTracker(const TTS: TTrackerSkill): Integer;
+var
+  i, l: Integer;
+  s: String;
+  arr: glTextureArray;
+  strs: glTextArray;
+begin
+  Result := -1;
+  arr := glGetTextures(XP_TRACKER_ICON_IDs[Ord(TTS)],
+                       XP_TRACKER_ICON_COL_IDs[Ord(TTS)],
+                       XP_TRACKER_DEFAULT_TOL);
+  l := Length(arr);
+  if (l = 0) then
+    Exit;
+  for i := 0 to High(arr) do
+  begin
+    // Adjust, making a static box that has enough room to grab EXP
+    with arr[i].Bounds do
+    begin
+      X1 := X1 - 73;
+      Y1 := Y1 + 3;
+      X2 := X2 - 24;
+      Y2 := Y2 - 3;
+    end;
+    // Search for characters and turn into text
+    strs := glCharsToTexts(glGetChars(arr[i].Bounds));
+    // If no text is found, or too much is found in one spot, Continue searching
+    if (Length(strs) <> 1) then
+      Continue;
+    // Take away non-number characters, and create a single string for the EXP
+    s := stripNonNum(strs[0].Text);
+    // If the string has nothing left continue searching
+    if (Length(s) = 0) then
+      Continue;
+    // If progressed to this code block, translate to Integer
+    Result := StrToIntDef(s, 01);
+    // If the result holds, return it.
+    if (Result >= 0) then
+      Break;
+  end;
+end;
+
