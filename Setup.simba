@@ -1,6 +1,9 @@
 //{$C ON} {$B ON} {$M ON} {$F ON} {$S ON}
 
 {$include_once GLXCore.Simba}
+{$IFNDEF SRLCompatibility}
+  {$include_once srl-6/lib/utilities/math.simba}
+{$ENDIF}
 {$include_once Misc/Graphics.Simba}
 {$include_once Mouse.Simba}
 {$include_once Login.Simba}
@@ -11,6 +14,9 @@
 {$include_once Cache.Simba}
 {$include_once Minimap.Simba}
 {$include_once Interfaces.Simba}
+
+{$include_once XPTracker.Simba}
+
 {$IFNDEF SRLCompatibility}
   {$ifdef SMART}
     {$include_once Misc/Smart.Simba}

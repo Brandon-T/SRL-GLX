@@ -4,63 +4,52 @@
     Item count, etc..
 *}
 
-
-
 {$include_once GLXCore.Simba}
 {$include_once Bank.Simba}
 {$include_once Cache.Simba}
+{$include_once Interfaces.Simba} // Added for GL_InvBounds, GL_GetAllInterface..
 
-{*
+(*
   Returns the Bounding-Box of the inventory.
 
   Developer Info:
     3786240  - TextureID of the inventory background (found in the middle of the inventory).
     386611   - TextureID of the corners of the minimap.
-*}
-Function GL_InvBounds: TBox;
+
+    263160 -middle
+
+*)
+function GL_InvBounds(): TBox;
+const
+  INV_ICON_TEXTURE_ID = 36941;
 var
-  I, J: Integer;
-  ChatBox: TBox;
-  Background, Others: glTextureArray;
-  Areas: TBoxArray;
-Begin
-  If (UseSysCache) Then
-  Begin
-    I := SysCache.Contains(TCacheType.CACHE_INV);
-    if (I <> -1) Then
-    Begin
-      Result := SysCache[I].Area;
+  i: Integer;
+  TBA: TBoxArray;
+  a: glTextureArray;
+begin
+  if (UseSysCache) then
+  begin
+    i := SysCache.Contains(TCacheType.CACHE_INV);
+    if (i <> -1) then
+    begin
+      Result := SysCache[i].Area;
       Exit;
-    End;
-  End;
-
+    end;
+  end;
   Result := IntToBox(-1, -1, -1, -1);
-  Background := glGetTextures(3786240);
-  Others := glGetTextures(386611);
-  ChatBox := gl_ChatBounds;
-
-  if (Length(Background) < 1) or (Length(Others) < 1) Then
+  TBA := GL_GetAllInterfaceBounds();
+  if (Length(TBA) = 0) then
     Exit;
-
-  For I := 0 To High(Background) Do
-  Begin
-    For J := 0 To High(Others) Do
-    Begin
-      If (PointInBox(Point(Others[J].X, Others[J].Y), Background[I].Bounds)) or (PointInBox(Background[I].Bounds.MidPoint, ChatBox)) Then
-        Continue(2);
-    End;
-
-    SetLength(Areas, Length(Areas) + 1);
-    Areas[High(Areas)] := Background[I].Bounds;
-  End;
-
-  if Length(Areas) = 0 then
-    Exit;
-
-  Result := Areas.Bounds;
-  If (UseSysCache) Then
-      SysCache.CacheInventory(Result);
-End;
+  for i := 0 to High(TBA) do
+  begin
+    a := glGetTextures(INV_ICON_TEXTURE_ID, TBA[i]);
+    if (Length(a) = 1) then
+    begin
+      Result := TBA[i];
+      Break;
+    end;
+  end;
+end;
 
 {*
   Returns the amount of slots visible within the inventory.
